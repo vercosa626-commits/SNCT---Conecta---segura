@@ -169,3 +169,15 @@ test('Fake call can be scheduled and cancelled without placing a real call',()=>
  h.run('actions.scheduleFakeCall()');assert.ok(h.run('fakeCallTimer'));assert.equal(h.run('prefs.fakeName'),'Tia Ana');
  h.run('actions.scheduleFakeCall()');assert.equal(h.run('fakeCallTimer'),null);assert.equal(h.requests.length,0);
 });
+
+test('Envio pelo celular continua ativo depois que a configuração termina de carregar',async()=>{
+ const h=harness({saved:{'cs:/conecta-segura/:demo:prefs':JSON.stringify({device:true})}});
+ for(let i=0;i<10;i++)await new Promise(r=>setImmediate(r));
+ assert.equal(h.run('prefs.device'),true);assert.equal(h.run('prefs.demo'),false);
+});
+
+test('Depois de concluir um teste, o SOS pode ser iniciado de novo',()=>{
+ const h=harness();h.run('startCountdown()');for(let i=0;i<5;i++)h.tick(1000);
+ assert.equal(h.run('activeAlert.stage'),'demo');
+ h.run('startCountdown()');assert.equal(h.run('activeAlert.stage'),'countdown');
+});
